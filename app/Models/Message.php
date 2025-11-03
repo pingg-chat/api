@@ -21,4 +21,9 @@ class Message extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function thread()
+    {
+        return $this->belongsTo(Message::class, 'thread_id');
+    }
 }

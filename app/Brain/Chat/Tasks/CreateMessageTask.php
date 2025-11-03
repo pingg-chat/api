@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
  * @property-read int $channelId
  * @property-read int $userId
  * @property-read string $content
+ * @property-read int|null $threadId
  *
  * @property Message $message
  */
@@ -28,7 +29,11 @@ class CreateMessageTask extends Task
                 Rule::exists('channel_user', 'user_id')
                     ->where('channel_id', $this->channelId),
             ],
-            'content' => ['required', 'string'],
+            'content'  => ['required', 'string'],
+            'threadId' => ['nullable', 'integer', 'exists:messages,id',
+                Rule::exists('messages', 'id')
+                    ->where('channel_id', $this->channelId),
+            ],
         ];
     }
 
@@ -38,6 +43,7 @@ class CreateMessageTask extends Task
             'channel_id' => $this->channelId,
             'user_id'    => $this->userId,
             'content'    => $this->content,
+            'thread_id'  => $this->threadId,
         ]);
 
         return $this;

@@ -47,6 +47,28 @@ it('should return a message intance when created', function () {
         ->toBeInstanceOf(Message::class);
 });
 
+it('should be able to send a message_id to answer in a thread', function () {
+    $parentMessage = Message::factory()
+        ->for($this->channel)
+        ->for($this->user)
+        ->create();
+
+    $task = CreateMessageTask::dispatchSync([
+        'channelId' => $this->channel->id,
+        'userId'    => $this->user->id,
+        'content'   => 'This is a reply',
+        'threadId'  => $parentMessage->id,
+    ]);
+
+    assertDatabaseHas('messages', [
+        'id'         => $task->message->id,
+        'channel_id' => $this->channel->id,
+        'user_id'    => $this->user->id,
+        'content'    => 'This is a reply',
+        'thread_id'  => $parentMessage->id,
+    ]);
+});
+
 // -----------------------------------------------
 // Validations
 
@@ -136,5 +158,49 @@ test('content must be a string', function () {
     ]))->toThrow(
         ValidationException::class,
         __('validation.string', ['attribute' => 'content'])
+    );
+});
+
+test('threadId must be an integer', function () {
+    expect(fn () => CreateMessageTask::dispatch([
+        'channelId' => $this->channel->id,
+        'userId'    => $this->user->id,
+        'content'   => 'Hello',
+        'threadId'  => 'invalid',
+    ]))->toThrow(
+        ValidationException::class,
+        __('validation.integer', ['attribute' => 'thread id'])
+    );
+});
+
+test('threadId must exist in messages table', function () {
+    expect(fn () => CreateMessageTask::dispatch([
+        'channelId' => $this->channel->id,
+        'userId'    => $this->user->id,
+        'content'   => 'Hello',
+        'threadId'  => 9999,
+    ]))->toThrow(
+        ValidationException::class,
+        __('validation.exists', ['attribute' => 'thread id'])
+    );
+});
+
+test('threadId must belong to the same channel', function () {
+    $otherChannel = Channel::factory()->for($this->workspace)->create();
+    $otherChannel->users()->attach($this->user);
+
+    $otherMessage = Message::factory()
+        ->for($otherChannel)
+        ->for($this->user)
+        ->create();
+
+    expect(fn () => CreateMessageTask::dispatch([
+        'channelId' => $this->channel->id,
+        'userId'    => $this->user->id,
+        'content'   => 'Hello',
+        'threadId'  => $otherMessage->id,
+    ]))->toThrow(
+        ValidationException::class,
+        __('validation.exists', ['attribute' => 'thread id'])
     );
 });
