@@ -37,6 +37,7 @@ class CreateWorkspaceTask extends Task
                 'name'        => $this->name,
                 'description' => $this->description,
                 'icon'        => $this->icon,
+                'connected'   => true,
             ]);
 
         return $this;

@@ -23,6 +23,7 @@ return new class () extends Migration
             $table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->primary(['workspace_id', 'user_id']);
+            $table->boolean('connected')->default(false);
             $table->timestamps();
         });
     }
