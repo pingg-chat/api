@@ -18,12 +18,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'email'    => $this->email,
             $this->mergeWhen($this->connectedWorkspace, [
-                'workspace' => [
-                    'id'          => $this->connectedWorkspace?->id,
-                    'name'        => $this->connectedWorkspace?->name,
-                    'description' => $this->connectedWorkspace?->description,
-                    'icon'        => $this->connectedWorkspace?->icon,
-                ],
+                'workspace' => WorkspaceResource::make($this->connectedWorkspace),
             ]),
         ];
     }
