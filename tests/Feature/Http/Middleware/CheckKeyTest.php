@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use App\Http\Middleware\CheckKey;
+use App\Models\User;
 
 test('check if middlware is register for api routes', function () {
     $route = collect(app('router')->getRoutes()->getRoutesByMethod()['GET'])
@@ -13,7 +14,12 @@ test('check if middlware is register for api routes', function () {
 });
 
 test('check if I can pass with the correct key', function () {
-    $this->withHeaders(['X-API-KEY' => config('app.key')])
+    User::factory()->create();
+
+    $this->withHeaders([
+        'X-API-KEY'      => config('app.key'),
+        'X-Auth-User-Id' => 1,
+    ])
         ->get(route('api.me'))
         ->assertStatus(200);
 });
