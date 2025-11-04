@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -26,7 +27,8 @@ class AppServiceProvider extends ServiceProvider
         $this->configUrls();
         $this->configModels();
         $this->configDates();
-        $this->configureCommands();
+        $this->configCommands();
+        $this->configResources();
     }
 
     protected function configPasswordRules(): void
@@ -64,10 +66,15 @@ class AppServiceProvider extends ServiceProvider
         Date::use(CarbonImmutable::class);
     }
 
-    protected function configureCommands(): void
+    protected function configCommands(): void
     {
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+    }
+
+    public function configResources(): void
+    {
+        JsonResource::withoutWrapping();
     }
 }
