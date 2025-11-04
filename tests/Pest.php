@@ -2,6 +2,12 @@
 
 declare(strict_types = 1);
 
+use App\Models\User;
+
+use function Pest\Laravel\withHeaders;
+
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -14,7 +20,7 @@ declare(strict_types = 1);
 */
 
 pest()
-    ->extend(Tests\TestCase::class)
+    ->extend(TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature', 'Brain');
 
@@ -44,7 +50,12 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function api(?User $user = null): TestCase
 {
-    // ..
+    $user = $user ?: User::factory()->create();
+
+    return withHeaders([
+        'X-API-KEY'      => config('app.key'),
+        'X-Auth-User-Id' => $user->id,
+    ]);
 }
