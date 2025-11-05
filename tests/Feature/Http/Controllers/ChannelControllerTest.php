@@ -13,6 +13,7 @@ beforeEach(function () {
     $this->workspace = Workspace::factory()->create();
     $this->user->workspaces()->attach($this->workspace->id);
     $this->channel = Channel::factory()->create(['workspace_id' => $this->workspace->id]);
+    $this->channel->users()->attach($this->user->id);
 });
 
 test('make sure we are calling the subscribe process', function () {
@@ -39,7 +40,9 @@ test('get all messages from the channel', function () {
         ->get(route('api.channels.messages', ['channel' => $this->channel->id]))
         ->assertStatus(200)
         ->assertJsonCount(3)
-        ->assertJsonFragment(['id' => $messages[0]->id])
+        ->assertJsonFragment([
+            'id' => $messages[0]->id,
+        ])
         ->assertJsonFragment(['id' => $messages[1]->id])
         ->assertJsonFragment(['id' => $messages[2]->id]);
 });
@@ -74,4 +77,14 @@ test('i need to be able to get messages from a thread', function () {
         ->assertJsonCount(2)
         ->assertJsonFragment(['id' => $threadMessages[0]->id])
         ->assertJsonFragment(['id' => $threadMessages[1]->id]);
+});
+
+it('should be able to send a new message to the channel', function () {
+    api($this->user)
+        ->post(
+            route('api.channels.messages', ['channel' => $this->channel->id, ]),
+            ['content' => 'New Message to the channel', ]
+        )
+        ->assertStatus(201)
+        ->assertJson(['id' => 1]);
 });
