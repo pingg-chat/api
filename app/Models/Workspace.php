@@ -22,4 +22,9 @@ class Workspace extends Model
         return $this->belongsToMany(User::class)
             ->withTimestamps();
     }
+
+    public function channels()
+    {
+        return $this->hasMany(Channel::class);
+    }
 }
