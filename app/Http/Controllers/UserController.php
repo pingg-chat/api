@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
-class UserController extends Controller
+class UserController
 {
     public function show(): JsonResource
     {

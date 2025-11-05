@@ -8,7 +8,7 @@ use App\Http\Resources\WorkspaceResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class WorkspaceController extends Controller
+class WorkspaceController
 {
     public function index()
     {
