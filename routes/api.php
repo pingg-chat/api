@@ -10,3 +10,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/me', [UserController::class, 'show'])->name('api.me');
 Route::get('/workspaces', [WorkspaceController::class, 'index'])->name('api.workspaces');
 Route::post('/channels/{channel}', [ChannelController::class, 'subscribe'])->name('api.channels.subscribe');
+Route::get('/channels/{channel}/messages/{thread?}', [ChannelController::class, 'messages'])->name('api.channels.messages');
