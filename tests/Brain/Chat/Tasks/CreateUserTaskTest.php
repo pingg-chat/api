@@ -14,6 +14,7 @@ it('should be able to create a new user', function (): void {
         'name'     => 'Valid Name',
         'username' => 'validusername',
         'email'    => 'valid@email.com',
+        'ssh_key'  => 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy' . sha1('validusername') . ' generated',
     ]);
 
     assertDatabaseHas('users', [
@@ -21,6 +22,7 @@ it('should be able to create a new user', function (): void {
         'name'     => 'Valid Name',
         'username' => 'validusername',
         'email'    => 'valid@email.com',
+        'ssh_key'  => 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy' . sha1('validusername') . ' generated',
     ]);
 });
 
@@ -30,13 +32,15 @@ it('should return the created user', function (): void {
         'name'     => 'Valid Name',
         'username' => 'validusername',
         'email'    => 'valid@email.com',
+        'ssh_key'  => 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy' . sha1('validusername') . ' generated',
     ]);
 
     expect($task->user)->toBeInstanceOf(User::class)
         ->and($task->user->icon)->toBe('')
         ->and($task->user->name)->toBe('Valid Name')
         ->and($task->user->username)->toBe('validusername')
-        ->and($task->user->email)->toBe('valid@email.com');
+        ->and($task->user->email)->toBe('valid@email.com')
+        ->and($task->user->ssh_key)->toBe('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy' . sha1('validusername') . ' generated');
 });
 
 // ------------------------------------------------------------------------------

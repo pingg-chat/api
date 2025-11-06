@@ -14,6 +14,7 @@ use Brain\Task;
  * @property-read string $email
  * @property-read string $name
  * @property-read string $username
+ * @property-read string $ssh_key
  *
  * @property User $user
  */
@@ -26,6 +27,7 @@ class CreateUserTask extends Task
             'name'     => ['required', 'min:3', 'max:100'],
             'username' => ['required', 'min:3', 'max:100', 'unique:users,username', 'alpha_dash'],
             'email'    => ['required', 'email', 'max:100', 'unique:users,email'],
+            'ssh_key'  => ['required', 'string', 'unique:users,ssh_key'],
         ];
     }
 
@@ -37,6 +39,7 @@ class CreateUserTask extends Task
                 'name'     => $this->name,
                 'username' => $this->username,
                 'email'    => $this->email,
+                'ssh_key'  => $this->ssh_key,
             ]);
 
         return $this;

@@ -17,6 +17,7 @@ class UserFactory extends Factory
             'name'     => fake()->name(),
             'email'    => fake()->unique()->safeEmail(),
             'username' => fake()->unique()->userName(),
+            'ssh_key'  => 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy' . $this->faker->sha1() . ' generated',
         ];
     }
 }

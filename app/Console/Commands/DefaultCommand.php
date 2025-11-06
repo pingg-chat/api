@@ -5,9 +5,13 @@ declare(strict_types = 1);
 namespace App\Console\Commands;
 
 use App\Brain\Chat\Processes\CreateUserProcess;
+use App\Models\User;
 use Illuminate\Console\Command;
 
-use function Laravel\Prompts\select;
+use function Laravel\Prompts\clear;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\search;
+use function Laravel\Prompts\spin;
 use function Laravel\Prompts\text;
 
 class DefaultCommand extends Command
@@ -16,14 +20,49 @@ class DefaultCommand extends Command
 
     protected $description = 'Default command description';
 
+    private ?User $user = null;
+
     public function handle()
     {
-        $this->info('Default command executed successfully.');
+        $sshkey = $_ENV['WHISP_USER_PUBLIC_KEY'];
+
+        clear();
+
+        note('   Pingg Chat ');
+
+        if (! $this->checkIfUserExists($sshkey)) {
+            $this->signUp($sshkey);
+        }
+
+        $this->openApplication();
+    }
+
+    private function openApplication(): void
+    {
+        note('Launching Pingg Chat application...');
+
+        // Here you would add the logic to launch the main application interface.
+        // For this example, we'll just display a message.
+        note('Pingg Chat is now running. Enjoy chatting!');
+
+        dump($this->user->toArray());
+    }
+
+    private function checkIfUserExists(string $sshkey): bool
+    {
+        $this->user = User::query()
+            ->where('ssh_key', $sshkey)
+            ->first();
+
+        return $this->user !== null;
+    }
+
+    private function signUp(string $sshkey): void
+    {
+        note('Welcome to Pingg! Let\'s set up your user account.');
 
         $whispUsername = $_ENV['WHISP_USERNAME'];
-        $sshkey        = $_ENV['WHISP_USER_PUBLIC_KEY'];
 
-        // --- Registration Workflow ---
         $name = text(
             label: 'Enter your name',
             placeholder: '',
@@ -45,39 +84,43 @@ class DefaultCommand extends Command
             validate: ['email', 'max:100']
         );
 
-        $icon = select(
+        $icon = search(
             label: 'Select an icon for your profile',
-            options: $this->icons(),
-            default: 'account',
+            options: fn (string $value) => $this->icons($value),
             required: true,
         );
 
-        dump(
-            compact(
-                'icon',
-                'name',
-                'username',
-                'email',
-                'sshkey',
-            )
+        $this->user = CreateUserProcess::dispatchSync([
+            'icon'     => $icon,
+            'name'     => $name,
+            'username' => $username,
+            'email'    => $email,
+            'ssh_key'  => $sshkey,
+        ])->user;
+
+        spin(
+            callback: fn () => sleep(5),
+            message: 'You account is being set up...'
         );
 
-        // CreateUserProcess::dispatch([
-        //     'icon'     => $icon,
-        //     'name'     => $name,
-        //     'username' => $username,
-        //     'email'    => $email,
-        //     'sshkey'   => $sshkey,
-        // ]);
+        note('Setup complete! You can now start using Pingg Chat.');
     }
 
-    private function icons(): array
+    private function icons(?string $filter = null): array
     {
-        // icons based on nerd fonts
-        return [
-            '󰻀' => 'penguim: 󰻀',
+        $icons = [
+            '󰻀' => 'penguin: 󰻀',
             '' => 'robot: ',
             '' => 'alien: ',
         ];
+
+        if ($filter) {
+            return array_filter(
+                $icons,
+                fn ($label) => str_contains($label, $filter)
+            );
+        }
+
+        return $icons;
     }
 }
