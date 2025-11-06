@@ -15,7 +15,7 @@ class ServeCommand extends Command
 
     public function handle()
     {
-        $server = new Server(port: 2222);
+        $server = new Server(port: config('app.ssh_server.port', 2222));
 
         $server->run(base_path('servers/default.php'));
     }

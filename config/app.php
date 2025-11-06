@@ -4,6 +4,10 @@ declare(strict_types = 1);
 
 return [
 
+    'ssh_server' => [
+        'port' => env('SSH_SERVER_PORT', 2222),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
