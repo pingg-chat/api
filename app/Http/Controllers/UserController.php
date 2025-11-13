@@ -16,6 +16,8 @@ class UserController
         /** @var User $user */
         $user = Auth::user();
 
+        abort_unless($user, 401);
+
         return UserResource::make($user);
     }
 }

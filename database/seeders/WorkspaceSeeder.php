@@ -13,6 +13,10 @@ class WorkspaceSeeder extends Seeder
     public function run(): void
     {
         User::all()
-            ->each(fn (User $user) => Workspace::factory()->create(['owner_id' => $user->id]));
+            ->each(function (User $user) {
+                $workspace = Workspace::factory()->create(['owner_id' => $user->id]);
+
+                $user->workspaces()->attach($workspace->id, ['connected' => true]);
+            });
     }
 }
