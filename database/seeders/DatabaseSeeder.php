@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $this->call(WorkspaceSeeder::class);
+        $this->call([
+            WorkspaceSeeder::class,
+            ChannelSeeder::class,
+        ]);
     }
 }

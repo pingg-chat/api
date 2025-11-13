@@ -13,6 +13,10 @@ class ChannelSeeder extends Seeder
     public function run(): void
     {
         Workspace::all()
-            ->each(fn (Workspace $workspace) => Channel::factory()->count(3)->create(['workspace_id' => $workspace->id]));
+            ->each(function (Workspace $workspace) {
+                $channel = Channel::factory()->create(['workspace_id' => $workspace->id]);
+
+                $workspace->owner->channels()->attach($channel->id);
+            });
     }
 }
