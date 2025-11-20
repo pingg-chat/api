@@ -39,13 +39,13 @@ class DefaultCommand extends Command
 
     private function openApplication(): void
     {
-        note('Launching Pingg Chat application...');
+        $width  = $_ENV['WHISP_TERM_WIDTH'] ?? getenv('COLUMNS') ?? 80;
+        $height = $_ENV['WHISP_TERM_HEIGHT'] ?? getenv('LINES') ?? 24;
 
-        // Here you would add the logic to launch the main application interface.
-        // For this example, we'll just display a message.
-        note('Pingg Chat is now running. Enjoy chatting!');
+        putenv("TERM_WIDTH={$width}");
+        putenv("TERM_HEIGHT={$height}");
 
-        dump($this->user->toArray());
+        passthru('pingg ' . $this->user->id);
     }
 
     private function checkIfUserExists(string $sshkey): bool
