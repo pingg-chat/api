@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 
 use function Laravel\Prompts\clear;
+
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\spin;
@@ -39,19 +40,24 @@ class DefaultCommand extends Command
 
     private function openApplication(): void
     {
-        $width  = $_ENV['WHISP_TERM_WIDTH'] ?? getenv('COLUMNS') ?? 80;
-        $height = $_ENV['WHISP_TERM_HEIGHT'] ?? getenv('LINES') ?? 24;
+        $term   = $_ENV['WHISP_TERM'] ?? 'xterm-256color';
+        $width  = $_ENV['WHISP_COLS'] ?? getenv('COLUMNS') ?: 80;
+        $height = $_ENV['WHISP_ROWS'] ?? getenv('LINES') ?: 24;
 
-        putenv("TERM_WIDTH={$width}");
-        putenv("TERM_HEIGHT={$height}");
+        $pinggPath = trim((string) shell_exec('which pingg'));
 
-        passthru('pingg ' . $this->user->id);
+        putenv("TERM={$term}");
+        putenv("WHISP_COLS={$width}");
+        putenv("WHISP_ROWS={$height}");
+        putenv('COLORTERM=truecolor');
+
+        pcntl_exec($pinggPath, [(string) $this->user->id, (string) $width, (string) $height]);
     }
 
     private function checkIfUserExists(string $sshkey): bool
     {
         $this->user = User::query()
-            ->where('ssh_key', $sshkey)
+            // ->where('ssh_key', $sshkey)
             ->first();
 
         return $this->user !== null;

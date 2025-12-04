@@ -17,6 +17,10 @@ class ChannelSeeder extends Seeder
                 $channel = Channel::factory()->create(['workspace_id' => $workspace->id]);
 
                 $workspace->owner->channels()->attach($channel->id);
+
+                $channel = Channel::factory()->create(['workspace_id' => $workspace->id]);
+
+                $workspace->owner->channels()->attach($channel->id);
             });
     }
 }
